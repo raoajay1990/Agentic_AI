@@ -1,0 +1,12 @@
+{
+ "type":"function",
+ "function":{
+    "name":"get_fixtures",
+    "description":"get the latest cricket fixtures, it does not require any parameters",
+    "parameters":{}
+    },
+    "returns":{
+        "type":"object",
+        "description":"provides data about different cricket fixture matches"
+    }   
+}
