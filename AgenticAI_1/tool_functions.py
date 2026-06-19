@@ -14,6 +14,8 @@ headers = {
 }
 
 tool_functions = {}
+tool_json_list = []
+fixtures_response_list=[]
 
 
 def tool_function_decorator(name):
@@ -27,6 +29,19 @@ def tool_function_decorator(name):
 def get_fixtures():
     response = requests.get(url, headers=headers)
     print(response.json())
+    wrapper_response = response_wrapper(response.json())
+    return wrapper_response
+
+def response_wrapper(response_dict):
+    match_response = response_dict['response']
+    text = "Date : " + match_response['schedules'][0]['scheduleAdWrapper']['date'] 
+    match_schedule_lst = match_response['schedules'][0]['scheduleAdWrapper']['matchScheduleList']
+    for match in match_schedule_lst:
+        text = text + '->'
+        text = text + " seriesname: " + match['seriesName'] + " -> "
+
+    return text
+
 
 
 def build_tool_registry(json_directory=None):
@@ -44,13 +59,17 @@ def build_tool_registry(json_directory=None):
             try:
                 with open(file_path, 'r') as f:
                     tool_data = json.load(f)
-                tool_name = tool_data.get('function', {}).get('name')
-                if tool_name in tool_functions:
-                    registry[tool_name] = tool_functions[tool_name]
+                    tool_json_list.append(tool_data)
+                    tool_name = tool_data.get('function', {}).get('name')
+                    if tool_name in tool_functions:
+                        registry[tool_name] = tool_functions[tool_name]
             except Exception:
-                # ignore malformed json or missing keys
+                
                 continue
     return registry
+
+
+
 
 
 tool_registry = build_tool_registry()
@@ -64,4 +83,4 @@ class ToolRegistry:
         return self._registry
 
 
-__all__ = ["tool_registry", "ToolRegistry", "get_fixtures"]
+__all__ = ["tool_registry", "ToolRegistry", "get_fixtures","tool_json_list"]
